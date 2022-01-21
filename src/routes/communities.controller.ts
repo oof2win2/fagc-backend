@@ -52,7 +52,7 @@ export default class CommunityController {
 		options: {
 			schema: {
 				params: z.object({
-					id: z.string().transform(x => x.toLowerCase()),
+					id: z.string(),
 				}),
 
 				tags: [ "community" ],
@@ -242,8 +242,8 @@ export default class CommunityController {
 					guildId: z.string()
 				}),
 				body: z.object({
-					ruleFilters: z.array(z.string()).optional().transform(x => x ? x.map(y => y.toLowerCase()) : x),
-					trustedCommunities: z.array(z.string()).optional().transform(x => x ? x.map(y => y.toLowerCase()) : x),
+					ruleFilters: z.array(z.string()).optional(),
+					trustedCommunities: z.array(z.string()).optional(),
 					roles: z.object({
 						reports: z.string().optional(),
 						webhooks: z.string().optional(),
@@ -356,7 +356,19 @@ export default class CommunityController {
 		}
 
 		// check other stuff
-		if (apiKey) guildConfig.apikey = apiKey
+		if (apiKey) {
+			const parsed = await parseApikey(apiKey)
+			if (parsed) {
+				const community = await CommunityModel.findOne({
+					id: parsed.sub,
+				})
+				if (community) {
+					// the api key is valid, so we can set it here
+					guildConfig.communityId = parsed.sub
+					guildConfig.apikey = apiKey
+				}
+			}
+		}
 		if (ruleFilters) guildConfig.ruleFilters = ruleFilters
 		if (trustedCommunities)
 			guildConfig.trustedCommunities = trustedCommunities
@@ -383,13 +395,13 @@ export default class CommunityController {
 			})
 		}
 
-		await GuildConfigModel.findOneAndReplace(
+		const newC = await GuildConfigModel.findOneAndReplace(
 			{
 				guildId: guildConfig.guildId,
 			},
-			guildConfig.toObject()
+			guildConfig.toObject(),
+			{ new: true }
 		)
-
 		guildConfigChanged(guildConfig)
 		return res.status(200).send({
 			...guildConfig.toObject(),
@@ -825,7 +837,7 @@ export default class CommunityController {
 		options: {
 			schema: {
 				params: z.object({
-					communityId: z.string().transform(x => x.toLowerCase()),
+					communityId: z.string(),
 				}),
 
 				description: "Delete a FAGC community",
@@ -924,8 +936,8 @@ export default class CommunityController {
 		options: {
 			schema: {
 				params: z.object({
-					idReceiving: z.string().transform(x => x.toLowerCase()),
-					idDissolving: z.string().transform(x => x.toLowerCase()),
+					idReceiving: z.string(),
+					idDissolving: z.string(),
 				}),
 
 				description: "Merge community idDissolving into community idReceiving",
