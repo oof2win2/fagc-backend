@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify"
 import { Controller, DELETE, GET, PATCH, POST } from "fastify-decorators"
 import RuleModel from "../database/rule"
-import { Authenticate, createApikey, MasterAuthenticate, OptionalAuthenticate } from "../utils/authentication"
+import { Authenticate, createApikey, MasterAuthenticate, OptionalAuthenticate, parseApikey } from "../utils/authentication"
 import CommunityModel from "../database/community"
 import GuildConfigModel from "../database/guildconfig"
 import {
@@ -250,8 +250,8 @@ export default class CommunityController {
 						setConfig: z.string().optional(),
 						setRules: z.string().optional(),
 						setCommunities: z.string().optional(),
-						apiKey: z.string().optional(),
-					}).optional()
+					}).optional(),
+					apiKey: z.string().optional(),
 				}),
 
 				tags: [ "community" ],
