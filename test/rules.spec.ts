@@ -1,5 +1,5 @@
 import RuleModel from "../src/database/rule"
-import backend from "./prepareTest"
+import backend from "../src/app"
 import * as mockingoose from "mockingoose"
 import { createRules } from "./utils"
 

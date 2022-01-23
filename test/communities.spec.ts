@@ -1,7 +1,7 @@
 import CommunityModel from "../src/database/community"
 import { Community } from "fagc-api-types"
 import { createApikey } from "../src/utils/authentication"
-import backend from "./prepareTest"
+import backend from "../src/"
 import * as mockingoose from "mockingoose"
 import { createCommunities, createCommunity } from "./utils"
 import { z } from "zod"
