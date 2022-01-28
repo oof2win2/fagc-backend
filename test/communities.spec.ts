@@ -65,7 +65,6 @@ describe("GET /own", () => {
 			}
 		}).then(x=>x.json())
 
-
 		expect(Community.parse(result)).toEqual(community)
 	})
 	it("Should throw an error if API key format is correct, but community was not found", async () => {
